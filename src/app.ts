@@ -12,7 +12,7 @@ app.use(cookieParser(process.env.COOKIE_SECURE));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const allowedOrigins = ['http://localhost:5173'];
+const allowedOrigins = ['http://localhost:5173','http://192.168.43.168:5173'];
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
