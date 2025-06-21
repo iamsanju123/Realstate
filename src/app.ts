@@ -11,20 +11,27 @@ const app: express.Application = express();
 app.use(cookieParser(process.env.COOKIE_SECURE));
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const allowedOrigins = ['http://localhost:5173'];
+
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173'); // or '*' (less secure)
+  const origin = req.headers.origin;
+   if(origin){
+   console.log(origin)
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }}
+
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight
+
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(204); // No Content
+    return res.sendStatus(204);
   }
 
   next();
-});
-app.use(express.json());
+});app.use(express.json());
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error("Error:", err);
