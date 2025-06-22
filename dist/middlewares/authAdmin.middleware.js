@@ -1,7 +1,7 @@
 export const isAdmin = (req, res, next) => {
     try {
         const userAdmin = req.isAdmin; // This assumes you have a previous middleware that sets `req.user` from JWT
-        console.log(userAdmin);
+        // console.log(userAdmin);
         if (userAdmin) {
             return next();
         }

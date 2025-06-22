@@ -8,11 +8,11 @@ export const listOfProjectService = async (
   limit: number
 ) => {
   try {
-    console.log("object2")
+    // console.log("object2")
     // if (!userId) {
     //   return new ApiResponse(401, "userId is not found", false, null);
     // }
-    console.log("hll")
+    // console.log("hll")
     const skip = (page - 1) * limit;
     const projectData = await Project.find()
       .skip(skip)
@@ -52,7 +52,7 @@ export const addNewProjectService = async (
       state,
       zipcode,
     });
-    console.log("not adding", addedProject);
+    // console.log("not adding", addedProject);
     if (!addedProject || !addedProject._id) {
       return new ApiResponse(
         401,
@@ -86,13 +86,13 @@ export const updateProjectByIdService = async (
     if (!mongoose.Types.ObjectId.isValid(projectId)) {
       return new ApiResponse(401, "project id is not valid", false, null);
     }
-    console.log("data updateField", updateField);
+    // console.log("data updateField", updateField);
     const updatedProject = await Project.findByIdAndUpdate(
       projectId,
       { $set: updateField },
       { new: true }
     );
-    console.log(updatedProject)
+    // console.log(updatedProject)
     if (!updatedProject || !updatedProject?._id) {
       return new ApiResponse(401, "error while update date", false, null);
     }

@@ -14,7 +14,7 @@ export const verifyUser = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const sid = req.signedCookies.sid;
-      console.log("sid",sid)
+      // console.log("sid",sid)
       if (!sid) {
         const response = new ApiResponse(
           404,

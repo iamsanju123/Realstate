@@ -203,7 +203,7 @@ export const loginService = async (email: string, password: string) => {
     }
 
     const allSessions = await UserSession.find({ userSessionId: user.id });
-    console.log("allsession", allSessions);
+    // console.log("allsession", allSessions);
     if (allSessions.length >= 2) {
       await allSessions[0].deleteOne();
     }
@@ -251,7 +251,6 @@ export const logoutService = async (sessionId: string) => {
       return response;
     }
     const session = await UserSession.findOne({ _id: sessionId });
-    // console.log(object)
     if (!session || session == null) {
       const response = new ApiResponse(404, "user is not login", false, null);
       return response;

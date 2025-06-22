@@ -1,5 +1,4 @@
 import express, { Request, Response, NextFunction } from "express";
-import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -13,10 +12,9 @@ app.use(cookieParser(process.env.COOKIE_SECURE));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req:Request,res:Response,next:NextFunction)=>{
-  console.log(req.headers)
   res.set("Access-Control-Allow-Origin",req.headers.origin)
     res.set('Access-Control-Allow-Credentials', 'true');
-  res.set("Access-Control-Allow-Methods","POST,PUT")
+  res.set("Access-Control-Allow-Methods","POST,PUT,PATCH,GET,HEAD")
   res.set("Access-Control-Allow-Headers","Content-Type, Authorization")
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204); // No Content
@@ -37,8 +35,10 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 import userRouter from "./routes/user.route.js";
 import projectRouter from "./routes/project.route.js";
+import notificationRouter from "./routes/notification.route.js"
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/project", projectRouter);
+app.use("/api/v1/notification",notificationRouter)
 
 export { app };
