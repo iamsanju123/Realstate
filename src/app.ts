@@ -11,19 +11,20 @@ const app: express.Application = express();
 app.use(cookieParser(process.env.COOKIE_SECURE));
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173'); // or '*' (less secure)
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight
+
+app.use((req:Request,res:Response,next:NextFunction)=>{
+  console.log(req.headers)
+  res.set("Access-Control-Allow-Origin",req.headers.origin)
+    res.set('Access-Control-Allow-Credentials', 'true');
+  res.set("Access-Control-Allow-Methods","POST,PUT")
+  res.set("Access-Control-Allow-Headers","Content-Type, Authorization")
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204); // No Content
   }
+  next()
+})
 
-  next();
-});
+app.use(express.json());
 app.use(express.json());
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

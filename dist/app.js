@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -9,10 +8,18 @@ dotenv.config({
 const app = express();
 app.use(cookieParser(process.env.COOKIE_SECURE));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({
-// origin: "http://localhost:5173",
-// credentials: true,
-}));
+app.use((req, res, next) => {
+    console.log(req.headers);
+    res.set("Access-Control-Allow-Origin", req.headers.origin);
+    res.set('Access-Control-Allow-Credentials', 'true');
+    res.set("Access-Control-Allow-Methods", "POST,PUT");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204); // No Content
+    }
+    next();
+});
+app.use(express.json());
 app.use(express.json());
 app.use((err, req, res, next) => {
     console.error("Error:", err);
