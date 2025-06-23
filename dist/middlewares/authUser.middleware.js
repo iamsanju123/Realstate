@@ -15,7 +15,7 @@ import { UserSession } from "../models/userSession.model.js";
 export const verifyUser = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const sid = req.signedCookies.sid;
-        // console.log("sid", sid);
+        // console.log("sid",sid)
         if (!sid) {
             const response = new ApiResponse(404, "User has not signed", false, null);
             return res.status(404).json(response);

@@ -10,6 +10,7 @@ interface IUser extends Document {
   email: string;
   password: string;
   isAdmin:boolean,
+  isActive:boolean,
   isPasswordCorrect(password: string): Promise<boolean>;
 }
 
@@ -53,6 +54,10 @@ const userSchema = new Schema<IUser>(
     isAdmin:{
         type:Boolean,
         default:false
+    },
+    isActive:{
+      type:Boolean,
+      default:false
     }
   },
   {

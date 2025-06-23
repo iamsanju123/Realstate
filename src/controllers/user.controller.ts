@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -6,12 +6,13 @@ import {
   allSessionsLogoutOfUserByIdService,
   getAllUserService,
   listOfUserService,
+  loginJwtService,
   loginService,
   logoutService,
   logoutUserBySessionIdService,
   registerService,
 } from "../services/user.service.js";
-import { pool } from "../db/mysql.db.js";
+
 
 interface AuthRequest extends Request {
   session?: any; // Define `user` as needed
@@ -19,11 +20,7 @@ interface AuthRequest extends Request {
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   try {
-    const { username, email, password, confirmPassword } = req.body;
-    const { role } = req.query;
-    if (!role) {
-      return;
-    }
+    const { username, email, password, confirmPassword, role} = req.body;
     const response = await registerService(
       username,
       email,
@@ -32,7 +29,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       role.toString()
     );
     if (!response) {
-      return;
+      return res.status(404).json(new ApiResponse(404,"something is error while register",false,null));
     }
     return res.status(response?.statusCode).json(response);
   } catch (error) {
@@ -46,6 +43,19 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     return res.status(501).json(response);
   }
 });
+
+export const loginJwt = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+try {
+  const {email,password} = req.body
+  const response = await loginJwtService(email,password)
+  if(!response){
+    return new ApiResponse(404,"something error while user login",false,null)
+  }
+  return res.status(response.statusCode).json(response)
+} catch (error) {
+  return new ApiResponse(501,"something error while user login",false,null)
+}
+})
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   try {

@@ -9,17 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { allSessionsLogoutOfUserByIdService, getAllUserService, listOfUserService, loginService, logoutService, logoutUserBySessionIdService, registerService, } from "../services/user.service.js";
+import { allSessionsLogoutOfUserByIdService, getAllUserService, listOfUserService, loginJwtService, loginService, logoutService, logoutUserBySessionIdService, registerService, } from "../services/user.service.js";
 export const register = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, email, password, confirmPassword } = req.body;
-        const { role } = req.query;
-        if (!role) {
-            return;
-        }
+        const { username, email, password, confirmPassword, role } = req.body;
         const response = yield registerService(username, email, password, confirmPassword, role.toString());
         if (!response) {
-            return;
+            return res.status(404).json(new ApiResponse(404, "something is error while register", false, null));
         }
         return res.status(response === null || response === void 0 ? void 0 : response.statusCode).json(response);
     }
@@ -27,6 +23,19 @@ export const register = asyncHandler((req, res) => __awaiter(void 0, void 0, voi
         console.log(error);
         const response = new ApiResponse(501, "Internal Error at registration", false, null);
         return res.status(501).json(response);
+    }
+}));
+export const loginJwt = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, password } = req.body;
+        const response = yield loginJwtService(email, password);
+        if (!response) {
+            return new ApiResponse(404, "something error while user login", false, null);
+        }
+        return res.status(response.statusCode).json(response);
+    }
+    catch (error) {
+        return new ApiResponse(501, "something error while user login", false, null);
     }
 }));
 export const login = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {

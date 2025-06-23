@@ -14,11 +14,11 @@ export const listOfProjectService = (
 // userId: string,
 page, limit) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("object2");
+        // console.log("object2")
         // if (!userId) {
         //   return new ApiResponse(401, "userId is not found", false, null);
         // }
-        console.log("hll");
+        // console.log("hll")
         const skip = (page - 1) * limit;
         const projectData = yield Project.find()
             .skip(skip)
@@ -43,7 +43,7 @@ projectname, address, city, state, zipcode) => __awaiter(void 0, void 0, void 0,
             state,
             zipcode,
         });
-        console.log("not adding", addedProject);
+        // console.log("not adding", addedProject);
         if (!addedProject || !addedProject._id) {
             return new ApiResponse(401, "project is not add something is error", false, null);
         }
@@ -58,9 +58,9 @@ export const updateProjectByIdService = (updateField, projectId) => __awaiter(vo
         if (!mongoose.Types.ObjectId.isValid(projectId)) {
             return new ApiResponse(401, "project id is not valid", false, null);
         }
-        console.log("data updateField", updateField);
+        // console.log("data updateField", updateField);
         const updatedProject = yield Project.findByIdAndUpdate(projectId, { $set: updateField }, { new: true });
-        console.log(updatedProject);
+        // console.log(updatedProject)
         if (!updatedProject || !(updatedProject === null || updatedProject === void 0 ? void 0 : updatedProject._id)) {
             return new ApiResponse(401, "error while update date", false, null);
         }

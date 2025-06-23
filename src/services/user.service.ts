@@ -1,6 +1,7 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { IUser, User } from "../models/user.model.js";
 import { UserSession } from "../models/userSession.model.js";
+import { createToken } from "../utils/CreateToken.js";
 interface registerInput {
   username: string;
   email: string;
@@ -97,22 +98,22 @@ export const registerService = async (
       );
       return response;
     }
-    let roleAcces: boolean = false;
-    if (role === "admin") {
-      roleAcces = true;
+    
+    if (!role) {
+      return new ApiResponse(404,"please defined user role",false,null)
     }
     const user = await User.create({
       username,
       email,
       password,
-      isAdmin:roleAcces,
+      role
     });
     if (user && user._id) {
       const response = new ApiResponse(
         201,
-        "something err while user register",
+        "user is successfully register",
         false,
-        null
+        user
       );
       return response;
     }
@@ -243,6 +244,26 @@ export const loginService = async (email: string, password: string) => {
     return response;
   }
 };
+
+export const loginJwtService = async(email:string,password:string)=>{
+try {
+  if(!email || !password){
+    return new ApiResponse(401,"please provide credential",false,null)
+  }
+  const verifyEmail = await User.findOne({email})
+  if(!verifyEmail || verifyEmail == null){
+    return new ApiResponse(404,"Invalide Credentilas",false,null)
+  }
+  const isPasswordValid = await verifyEmail?.isPasswordCorrect(String(password));
+  if(!isPasswordValid){
+    return new ApiResponse(401,"invalide credentials",false,null)
+  }
+  const token = createToken(verifyEmail)
+  return new ApiResponse(200,"user is login succesfully",true,{verifyEmail,token})
+} catch (error) {
+  
+}
+}
 
 export const logoutService = async (sessionId: string) => {
   try {

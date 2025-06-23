@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { UserSession } from "../models/userSession.model.js";
+import { createToken } from "../utils/CreateToken.js";
 export const registerService = (username, email, password, confirmPassword, role) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const fields = { username, email, password, confirmPassword };
@@ -70,18 +71,17 @@ export const registerService = (username, email, password, confirmPassword, role
             const response = new ApiResponse(404, "User has already register on this email", false, null);
             return response;
         }
-        let roleAcces = false;
-        if (role === "admin") {
-            roleAcces = true;
+        if (!role) {
+            return new ApiResponse(404, "please defined user role", false, null);
         }
         const user = yield User.create({
             username,
             email,
             password,
-            isAdmin: roleAcces,
+            role
         });
         if (user && user._id) {
-            const response = new ApiResponse(201, "something err while user register", false, null);
+            const response = new ApiResponse(201, "user is successfully register", false, user);
             return response;
         }
     }
@@ -148,7 +148,7 @@ export const loginService = (email, password) => __awaiter(void 0, void 0, void 
             return response;
         }
         const allSessions = yield UserSession.find({ userSessionId: user.id });
-        console.log("allsession", allSessions);
+        // console.log("allsession", allSessions);
         if (allSessions.length >= 2) {
             yield allSessions[0].deleteOne();
         }
@@ -172,6 +172,25 @@ export const loginService = (email, password) => __awaiter(void 0, void 0, void 
         return response;
     }
 });
+export const loginJwtService = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!email || !password) {
+            return new ApiResponse(401, "please provide credential", false, null);
+        }
+        const verifyEmail = yield User.findOne({ email });
+        if (!verifyEmail || verifyEmail == null) {
+            return new ApiResponse(404, "Invalide Credentilas", false, null);
+        }
+        const isPasswordValid = yield (verifyEmail === null || verifyEmail === void 0 ? void 0 : verifyEmail.isPasswordCorrect(String(password)));
+        if (!isPasswordValid) {
+            return new ApiResponse(401, "invalide credentials", false, null);
+        }
+        const token = createToken(verifyEmail);
+        return new ApiResponse(200, "user is login succesfully", true, { verifyEmail, token });
+    }
+    catch (error) {
+    }
+});
 export const logoutService = (sessionId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!sessionId) {
@@ -179,7 +198,6 @@ export const logoutService = (sessionId) => __awaiter(void 0, void 0, void 0, fu
             return response;
         }
         const session = yield UserSession.findOne({ _id: sessionId });
-        // console.log(object)
         if (!session || session == null) {
             const response = new ApiResponse(404, "user is not login", false, null);
             return response;
