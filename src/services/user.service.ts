@@ -261,7 +261,7 @@ try {
   const token = createToken(verifyEmail)
   return new ApiResponse(200,"user is login succesfully",true,{verifyEmail,token})
 } catch (error) {
-  
+  return new ApiResponse(501,"error while login",false,null)
 }
 }
 
@@ -376,6 +376,44 @@ export const getAllUserService = async(page:number,limit:number)=>{
     }
     return new ApiResponse(401,'Error while fetching user',false,null)
   } catch (error) {
-    
+       return new ApiResponse(404,"error while getting all user",false,null)
   }
+}
+
+export const getUserByIdService = async(userId:string)=>{
+  try{
+    if(!userId){
+     return new ApiResponse(404,"user Id is not found",false,null)
+    }
+    const user = await User.findById({_id:userId})
+    if(!user){
+       return new ApiResponse(404,"user is not found",false,null)
+    }
+    return new ApiResponse(200,"user is successfully fetched",true,user)
+  }catch(error){
+       return new ApiResponse(501,"error while getting user",false,null)
+  }
+}
+
+export const updateUserStatusByIdService = async(userId:string,isActive:string)=>{
+try {
+  if(!userId){
+    return new ApiResponse(404,"user Id is not found",false,null)
+  }
+  let bool
+  console.log("acive",isActive)
+  if(isActive == "true"){
+    bool = true
+  }else{
+    bool = false
+  }
+
+  const updatedStatus = await User.findByIdAndUpdate(userId,{$set:{isActive:bool}})
+  if(!updatedStatus){
+    return new ApiResponse(404,"status is not updating",false,null)
+  }
+  return new ApiResponse(201,"update successfully",true,null)
+} catch (error) { 
+  return new ApiResponse(501,"error while update status",false,null)
+}
 }

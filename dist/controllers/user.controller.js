@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { allSessionsLogoutOfUserByIdService, getAllUserService, listOfUserService, loginJwtService, loginService, logoutService, logoutUserBySessionIdService, registerService, } from "../services/user.service.js";
+import { allSessionsLogoutOfUserByIdService, getAllUserService, getUserByIdService, listOfUserService, loginJwtService, loginService, logoutService, logoutUserBySessionIdService, registerService, updateUserStatusByIdService, } from "../services/user.service.js";
 export const register = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, email, password, confirmPassword, role } = req.body;
@@ -144,4 +144,31 @@ export const getAllUser = asyncHandler((req, res) => __awaiter(void 0, void 0, v
         }
     }
     catch (error) { }
+}));
+export const getUserById = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.userId;
+        const response = yield getUserByIdService(userId);
+        if (!response) {
+            return res.status(404).json(new ApiResponse(404, "error while getting user", false, null));
+        }
+        return res.status(response.statusCode).json(response);
+    }
+    catch (error) {
+        return res.status(501).json(new ApiResponse(501, "error while getting user", false, null));
+    }
+}));
+export const updateUserStatusById = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { isActive } = req.body;
+        const userId = req.params.userId;
+        const response = yield updateUserStatusByIdService(userId, isActive);
+        if (!response) {
+            return res.status(404).json(new ApiResponse(404, "Error while updating admin", false, null));
+        }
+        res.status(response.statusCode).json(response);
+    }
+    catch (error) {
+        return res.status(501).json(new ApiResponse(501, "Error while updating admin", false, null));
+    }
 }));

@@ -5,12 +5,14 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   allSessionsLogoutOfUserByIdService,
   getAllUserService,
+  getUserByIdService,
   listOfUserService,
   loginJwtService,
   loginService,
   logoutService,
   logoutUserBySessionIdService,
   registerService,
+  updateUserStatusByIdService,
 } from "../services/user.service.js";
 
 
@@ -220,3 +222,30 @@ export const getAllUser = asyncHandler(async (req: Request, res: Response) => {
     }
   } catch (error) {}
 });
+
+export const getUserById = asyncHandler(async(req:Request,res:Response)=>{
+  try {
+    const userId = req.params.userId
+    const response = await getUserByIdService(userId)
+    if(!response){
+      return res.status(404).json(new ApiResponse(404,"error while getting user",false,null))
+    }
+    return res.status(response.statusCode).json(response)
+  } catch (error) {
+    return res.status(501).json(new ApiResponse(501,"error while getting user",false,null))
+  }
+})
+
+export const updateUserStatusById = asyncHandler(async(req:Request,res:Response)=>{
+  try {
+    const { isActive } = req.body
+    const userId = req.params.userId
+    const response = await updateUserStatusByIdService(userId,isActive)
+    if(!response){
+      return res.status(404).json(new ApiResponse(404,"Error while updating admin",false,null))
+    }
+    res.status(response.statusCode).json(response)
+  } catch (error) {
+    return res.status(501).json(new ApiResponse(501,"Error while updating admin",false,null))
+  }
+})

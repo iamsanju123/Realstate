@@ -189,6 +189,7 @@ export const loginJwtService = (email, password) => __awaiter(void 0, void 0, vo
         return new ApiResponse(200, "user is login succesfully", true, { verifyEmail, token });
     }
     catch (error) {
+        return new ApiResponse(501, "error while login", false, null);
     }
 });
 export const logoutService = (sessionId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -276,5 +277,44 @@ export const getAllUserService = (page, limit) => __awaiter(void 0, void 0, void
         return new ApiResponse(401, 'Error while fetching user', false, null);
     }
     catch (error) {
+        return new ApiResponse(404, "error while getting all user", false, null);
+    }
+});
+export const getUserByIdService = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!userId) {
+            return new ApiResponse(404, "user Id is not found", false, null);
+        }
+        const user = yield User.findById({ _id: userId });
+        if (!user) {
+            return new ApiResponse(404, "user is not found", false, null);
+        }
+        return new ApiResponse(200, "user is successfully fetched", true, user);
+    }
+    catch (error) {
+        return new ApiResponse(501, "error while getting user", false, null);
+    }
+});
+export const updateUserStatusByIdService = (userId, isActive) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!userId) {
+            return new ApiResponse(404, "user Id is not found", false, null);
+        }
+        let bool;
+        console.log("acive", isActive);
+        if (isActive == "true") {
+            bool = true;
+        }
+        else {
+            bool = false;
+        }
+        const updatedStatus = yield User.findByIdAndUpdate(userId, { $set: { isActive: bool } });
+        if (!updatedStatus) {
+            return new ApiResponse(404, "status is not updating", false, null);
+        }
+        return new ApiResponse(201, "update successfully", true, null);
+    }
+    catch (error) {
+        return new ApiResponse(501, "error while update status", false, null);
     }
 });
