@@ -65,10 +65,17 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-userSchema.pre<IUser>("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+userSchema.pre<IUser>('save', async function (next) {
+  console.log("object hook is calling")
+  if (!this.isModified('password')) return next(); // Only hash if changed
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err) {
+    next(err as Error);
+  }
 });
 
 userSchema.methods.isPasswordCorrect = async function (

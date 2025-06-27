@@ -11,6 +11,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { UserSession } from "../models/userSession.model.js";
 import { createToken } from "../utils/CreateToken.js";
+import { sendEmail } from "../utils/mailService.js";
+import { VerifyOtp } from "../models/otp.model.js";
+import { createDocList } from "../utils/CreateDoc.js";
 export const registerService = (username, email, password, confirmPassword, role) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const fields = { username, email, password, confirmPassword };
@@ -81,7 +84,8 @@ export const registerService = (username, email, password, confirmPassword, role
             role
         });
         if (user && user._id) {
-            const response = new ApiResponse(201, "user is successfully register", false, user);
+            const property = yield createDocList(user === null || user === void 0 ? void 0 : user._id.toString());
+            const response = new ApiResponse(201, "user is successfully register", false, { user, property });
             return response;
         }
     }
@@ -300,21 +304,93 @@ export const updateUserStatusByIdService = (userId, isActive) => __awaiter(void 
         if (!userId) {
             return new ApiResponse(404, "user Id is not found", false, null);
         }
-        let bool;
-        console.log("acive", isActive);
-        if (isActive == "true") {
-            bool = true;
-        }
-        else {
-            bool = false;
-        }
-        const updatedStatus = yield User.findByIdAndUpdate(userId, { $set: { isActive: bool } });
+        const updatedStatus = yield User.findByIdAndUpdate(userId, { $set: { isActive: isActive } }, { new: true });
         if (!updatedStatus) {
             return new ApiResponse(404, "status is not updating", false, null);
         }
-        return new ApiResponse(201, "update successfully", true, null);
+        return new ApiResponse(201, "update successfully", true, updatedStatus);
     }
     catch (error) {
         return new ApiResponse(501, "error while update status", false, null);
+    }
+});
+export const forgetPasswordService = (email, password, confirmPassword) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("object email");
+        if (!email || !confirmPassword || !password) {
+            return new ApiResponse(404, "require all the  neccessary input credential", false, null);
+        }
+        if (confirmPassword !== password) {
+            return new ApiResponse(401, "password is not matched with confirmpassword", false, null);
+        }
+        const data = yield User.findOne({ email: email });
+        console.log(data);
+        if (!data || data == null) {
+            return new ApiResponse(404, "credentila in not valid", false, null);
+        }
+        data.password = password;
+        const updateUser = yield data.save();
+        if (!updateUser || updateUser == null) {
+            return new ApiResponse(401, "password is not udated", false, null);
+        }
+        const isPasswordValid = yield (data === null || data === void 0 ? void 0 : data.isPasswordCorrect(String(password)));
+        if (!isPasswordValid) {
+            return new ApiResponse(401, "password is not updated successfully", false, null);
+        }
+        return new ApiResponse(200, "password update successfully", true, null);
+    }
+    catch (error) {
+        return new ApiResponse(501, "internal error while updateing password", false, null);
+    }
+});
+export const sendOtpService = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(email);
+        if (!email) {
+            return new ApiResponse(401, "enail is not found", false, null);
+        }
+        const verifyUser = User.findOne({ email });
+        if (!verifyUser || verifyUser == null) {
+            return new ApiResponse(401, "enmail is not found", false, null);
+        }
+        const generateOTP = () => {
+            return Math.floor(100000 + Math.random() * 900000);
+        };
+        const sendOtp = generateOTP();
+        const savedOtp = yield VerifyOtp.create({
+            email,
+            sendOtp,
+        });
+        console.log(" savedotp", savedOtp);
+        if (!savedOtp || savedOtp == null) {
+            return new ApiResponse(401, "error while creating otp", false, null);
+        }
+        let subject = "otp for real state password change";
+        let h3 = `<h3>your otp is ${sendOtp} <h3>`;
+        console.log({ to: email, subject, html: h3 });
+        const result = yield sendEmail({ to: email, subject, html: h3 });
+        return new ApiResponse(201, "otp send succesfully", true, null);
+    }
+    catch (error) {
+        console.log("object");
+        return new ApiResponse(501, "errow while otp sending", false, null);
+    }
+});
+export const verifyUserOtpService = (otp, email) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!otp || !email) {
+            return new ApiResponse(404, "require all fields of data", false, null);
+        }
+        const savedOtpData = yield VerifyOtp.findOne({ email: email });
+        if (!savedOtpData || savedOtpData == null) {
+            return new ApiResponse(404, "data is not found or limit will be cross", false, null);
+        }
+        if (savedOtpData.sendOtp === otp) {
+            return new ApiResponse(200, "OTP verify successfully", true, null);
+        }
+        return new ApiResponse(200, "OTP is not matched", false, null);
+    }
+    catch (error) {
+        return new ApiResponse(200, "error while otp matching", false, null);
     }
 });

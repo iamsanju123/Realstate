@@ -33,11 +33,11 @@ export const listOfProject = asyncHandler((req, res) => __awaiter(void 0, void 0
 export const addNewProject = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // const userId = req.session.userSessionId;
-        const { projectname, address, city, state, zipcode } = req.body;
-        console.log(projectname, address, city, state, zipcode);
+        const { projectname, address, city, state, zipcode, location } = req.body;
+        console.log(projectname, address, city, state, zipcode, location);
         const response = yield addNewProjectService(
         // userId,
-        projectname, address, city, state, zipcode);
+        projectname, address, city, state, zipcode, location);
         if (!response) {
             return null;
         }

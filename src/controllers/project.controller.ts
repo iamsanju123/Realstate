@@ -52,15 +52,16 @@ export const addNewProject = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     try {
       // const userId = req.session.userSessionId;
-      const { projectname, address, city, state, zipcode } = req.body;
-       console.log( projectname, address, city, state, zipcode)
+      const { projectname, address, city, state, zipcode,location } = req.body;
+       console.log( projectname, address, city, state, zipcode,location)
       const response = await addNewProjectService(
         // userId,
         projectname,
         address,
         city,
         state,
-        zipcode
+        zipcode,
+        location
       );
       if (!response) {
         return null
@@ -74,7 +75,7 @@ export const addNewProject = asyncHandler(
             501,
             "Internal server error while fetching list of project",
             false,
-            null
+            null  
           )
         );
     }

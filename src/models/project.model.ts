@@ -7,7 +7,8 @@ interface IProject extends Document {
   city: string;
   state: string;
   zipcode: number;
-  status:boolean;
+  status: boolean;
+  location: string;
 }
 
 const projectSchema = new Schema<IProject>(
@@ -40,10 +41,13 @@ const projectSchema = new Schema<IProject>(
       type: Number,
       //   required: true,
     },
-    status:{
-      type:Boolean,
-      default:false
-    }
+    status: {
+      type: Boolean,
+      default: false,
+    },
+    location: {
+      type: String,
+    },
   },
   {
     timestamps: true,

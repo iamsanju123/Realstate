@@ -34,7 +34,7 @@ page, limit) => __awaiter(void 0, void 0, void 0, function* () {
 });
 export const addNewProjectService = (
 // userId: string,
-projectname, address, city, state, zipcode) => __awaiter(void 0, void 0, void 0, function* () {
+projectname, address, city, state, zipcode, location) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const addedProject = yield Project.create({
             projectname,
@@ -42,6 +42,7 @@ projectname, address, city, state, zipcode) => __awaiter(void 0, void 0, void 0,
             city,
             state,
             zipcode,
+            location
         });
         // console.log("not adding", addedProject);
         if (!addedProject || !addedProject._id) {
@@ -55,12 +56,17 @@ projectname, address, city, state, zipcode) => __awaiter(void 0, void 0, void 0,
 });
 export const updateProjectByIdService = (updateField, projectId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        if (!projectId) {
+            return new ApiResponse(404, "project id is not found", false, null);
+        }
         if (!mongoose.Types.ObjectId.isValid(projectId)) {
             return new ApiResponse(401, "project id is not valid", false, null);
         }
         // console.log("data updateField", updateField);
         const updatedProject = yield Project.findByIdAndUpdate(projectId, { $set: updateField }, { new: true });
-        // console.log(updatedProject)
+        if (updatedProject == null) {
+            return new ApiResponse(401, "product data is not found", false, null);
+        }
         if (!updatedProject || !(updatedProject === null || updatedProject === void 0 ? void 0 : updatedProject._id)) {
             return new ApiResponse(401, "error while update date", false, null);
         }

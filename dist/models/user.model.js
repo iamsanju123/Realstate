@@ -55,12 +55,19 @@ const userSchema = new Schema({
 }, {
     timestamps: true,
 });
-userSchema.pre("save", function (next) {
+userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!this.isModified("password"))
-            return next();
-        this.password = yield bcrypt.hash(this.password, 10);
-        next();
+        console.log("object hook is calling");
+        if (!this.isModified('password'))
+            return next(); // Only hash if changed
+        try {
+            const salt = yield bcrypt.genSalt(10);
+            this.password = yield bcrypt.hash(this.password, salt);
+            next();
+        }
+        catch (err) {
+            next(err);
+        }
     });
 });
 userSchema.methods.isPasswordCorrect = function (password) {

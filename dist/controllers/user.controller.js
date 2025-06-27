@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { allSessionsLogoutOfUserByIdService, getAllUserService, getUserByIdService, listOfUserService, loginJwtService, loginService, logoutService, logoutUserBySessionIdService, registerService, updateUserStatusByIdService, } from "../services/user.service.js";
+import { allSessionsLogoutOfUserByIdService, forgetPasswordService, getAllUserService, getUserByIdService, listOfUserService, loginJwtService, loginService, logoutService, logoutUserBySessionIdService, registerService, sendOtpService, updateUserStatusByIdService, verifyUserOtpService, } from "../services/user.service.js";
 export const register = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, email, password, confirmPassword, role } = req.body;
@@ -73,7 +73,20 @@ export const logout = asyncHandler((req, res) => __awaiter(void 0, void 0, void 
         return res.status(501).json(response);
     }
 }));
-export const forgetPassword = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () { }));
+export const forgetPassword = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, confirmPassword, password } = req.body;
+        console.log(email, confirmPassword, password);
+        const response = yield forgetPasswordService(email, confirmPassword, password);
+        if (!response) {
+            return res.status(404).json(new ApiResponse(404, "error while forgetting password", false, null));
+        }
+        return res.status(response === null || response === void 0 ? void 0 : response.statusCode).json(response);
+    }
+    catch (error) {
+        return res.status(501).json(new ApiResponse(501, "internal error while forgetting password", false, null));
+    }
+}));
 //admin
 export const listOfUser = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -170,5 +183,31 @@ export const updateUserStatusById = asyncHandler((req, res) => __awaiter(void 0,
     }
     catch (error) {
         return res.status(501).json(new ApiResponse(501, "Error while updating admin", false, null));
+    }
+}));
+export const sendOtp = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        const response = yield sendOtpService(email);
+        if (!response) {
+            return res.status(404).json(new ApiResponse(404, "error while generating error", false, null));
+        }
+        return res.status(response.statusCode).json(response);
+    }
+    catch (error) {
+        return res.status(501).json(new ApiResponse(501, "Internal error", false, null));
+    }
+}));
+export const verifyUserOtp = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { otp, email } = req.body;
+        const response = yield verifyUserOtpService(otp, email);
+        if (!response) {
+            return res.json(new ApiResponse(404, "error while getting api respose", false, null));
+        }
+        return res.status(response.statusCode).json(response);
+    }
+    catch (error) {
+        return res.status(501).json(new ApiResponse(501, "error while verify otp", false, null));
     }
 }));

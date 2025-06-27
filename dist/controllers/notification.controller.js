@@ -59,3 +59,5 @@ export const markAllAsRead = asyncHandler((req, res) => __awaiter(void 0, void 0
             .json(new ApiResponse(501, "Internal server error", false, null));
     }
 }));
+export const listofAllNotification = asyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));

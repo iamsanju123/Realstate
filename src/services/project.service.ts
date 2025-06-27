@@ -14,9 +14,9 @@ export const listOfProjectService = async (
     // }
     // console.log("hll")
     const skip = (page - 1) * limit;
-    const projectData = await Project.find()
-      .skip(skip)
-      .limit(limit);
+    const projectData = await Project.find();
+    // .skip(skip)
+    // .limit(limit);
     if (!projectData || projectData == null) {
       return new ApiResponse(401, "project data is not  found", false, null);
     }
@@ -42,15 +42,18 @@ export const addNewProjectService = async (
   address: string,
   city: string,
   state: string,
-  zipcode: number
+  zipcode: number,
+  location: string
 ) => {
   try {
-    const addedProject = await Project.create({//userId,
+    const addedProject = await Project.create({
+      //userId,
       projectname,
       address,
       city,
       state,
       zipcode,
+      location,
     });
     // console.log("not adding", addedProject);
     if (!addedProject || !addedProject._id) {
@@ -83,6 +86,9 @@ export const updateProjectByIdService = async (
   projectId: string
 ) => {
   try {
+    if (!projectId) {
+      return new ApiResponse(404, "project id is not found", false, null);
+    }
     if (!mongoose.Types.ObjectId.isValid(projectId)) {
       return new ApiResponse(401, "project id is not valid", false, null);
     }
@@ -92,7 +98,9 @@ export const updateProjectByIdService = async (
       { $set: updateField },
       { new: true }
     );
-    // console.log(updatedProject)
+    if (updatedProject == null) {
+      return new ApiResponse(401, "product data is not found", false, null);
+    }
     if (!updatedProject || !updatedProject?._id) {
       return new ApiResponse(401, "error while update date", false, null);
     }

@@ -30,8 +30,11 @@ const projectSchema = new Schema({
     },
     status: {
         type: Boolean,
-        default: false
-    }
+        default: false,
+    },
+    location: {
+        type: String,
+    },
 }, {
     timestamps: true,
 });

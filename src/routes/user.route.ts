@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {  getAllUser, login, loginJwt, logout, register,getUserById, updateUserStatusById } from "../controllers/user.controller.js";
+import {  getAllUser, login, loginJwt, logout, register,getUserById, updateUserStatusById, forgetPassword, sendOtp, verifyUserOtp } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/authUser.middleware.js";
 
 const router = Router()
@@ -9,5 +9,9 @@ router.route('/login').post(loginJwt)
 router.route('/').post(verifyUser,logout)
 router.route('/').get(getAllUser)
 router.route('/:userId').get(getUserById)
-router.route('/:userId').patch(updateUserStatusById)
+router.route('/forget-password').post(forgetPassword)
+router.route('/status/:userId').patch(updateUserStatusById)
+router.route('/send-otp').post(sendOtp)
+router.route('/verify-otp').post(verifyUserOtp)
+
 export default router

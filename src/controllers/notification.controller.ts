@@ -75,3 +75,7 @@ export const markAllAsRead = asyncHandler(
     }
   }
 );
+
+export const listofAllNotification = asyncHandler(async(req:Request,res:Response)=>{
+    
+})
