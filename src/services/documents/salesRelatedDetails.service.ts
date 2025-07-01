@@ -17,13 +17,6 @@ export const listOfSalesRelatedDetailsService = async (salesId: string) => {
     }
     const createdSales = await SalesDetail.create({
       salesId,
-      contract: "",
-      paymentSchedule: "",
-      possesionLater: "",
-      allotmentLater: "",
-      floorPlan: "",
-      builtUpAreaStatement: "",
-      specificationList: "",
     });
     if(!createdSales || createdSales == null){
         return new ApiResponse(404, "error while getting data",false,null)
